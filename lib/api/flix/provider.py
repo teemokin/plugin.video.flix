@@ -88,6 +88,9 @@ class ProviderResult(dict):
     set_url, url = _setter_and_getter("url")
     set_provider_data, provider_data = _setter_and_getter("provider_data")
 
+    # Added: Subtitles
+    set_provider_subtitles, provider_subtitles = _setter_and_getter("provider_subtitles")
+
 
 class Provider(object):
     """
