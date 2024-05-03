@@ -106,11 +106,17 @@ class VideoItem(object):
         self._art = kwargs.get("art", {})
         self._cast = kwargs.get("cast", [])
 
-    def to_list_item(self, path=None, playable=False):
+    # Added subtitles
+    def to_list_item(self, path=None, playable=False, subz=None):
         list_item = xbmcgui.ListItem(self._title)
         list_item.setInfo("video", self._info)
         list_item.setArt(self._art)
         list_item.setCast(self._cast)
+
+        # Added - Subtitles
+        if subz:
+            list_item.setSubtitles(subz)
+        
         if playable:
             list_item.setProperty("IsPlayable", "true")
         if path is not None:
@@ -361,6 +367,10 @@ class Season(SeasonItem):
 
         still_path = get_image(episode, "still_path")
         art = {"icon": "DefaultVideo.png", "thumb": still_path, "poster": still_path, "fanart": still_path}
+
+        # Added: seasonxepisode on before title "1x03 - Episode 3"
+        title = "{}x{} - {}".format(self._season_number, str(episode_number).zfill(2), title)
+        
         return EpisodeItem(self._show_id, self._season_number, episode_number,
                            title=title, info=info, art=art, cast=get_cast(cast))
 
