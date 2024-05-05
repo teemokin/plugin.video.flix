@@ -147,7 +147,7 @@ def play(item, method, *args, **kwargs):
         if auto_choose_media():
             selected = 0
         else:
-            dialog = dialog_select(translate(30113))
+            dialog = dialog_select(translate(30113)) # Result Found
             for p, r in results:
                 try:
                     dialog.add_item(label=r.label, label2=r.label2, icon=r.icon)
@@ -163,6 +163,7 @@ def play(item, method, *args, **kwargs):
             path = provider_result.url
             # Added - Subtitles from providers
             ext_subs = provider_result.ext_subs
+
             if not path:
                 logging.debug("Need to call 'resolve' from provider %s", provider)
                 try:
@@ -175,7 +176,7 @@ def play(item, method, *args, **kwargs):
         notification(translate(30146))
     else:
         notification(translate(30112))
-        
+
     # Added - Finally Adding subs to setResolvedUrl
     if path:
         logging.debug("Going to play url '%s' from provider %s", path, provider)
