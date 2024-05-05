@@ -79,27 +79,55 @@ def get_providers_results(method, *args, **kwargs):
     return results
 
 
-def check_replay(func, sep=":"):
+# Added - sep ":" to "@"
+def check_replay(func, sep="@"):
     def wrapper(item, *args, **kwargs):
         if not save_last_result():
             return func(item, *args, **kwargs)
 
         current_id = str(item)
-        key = "flix:last_played:" + item.__class__.__name__
+        key = "flix:last_played:" + item.__class__.__name__ # flix:last_played:EpisodeItem
         value = get_property(key)
 
+        '''
+        # Added - important here
+        value <<<<<<
+        value is concated with : before I changed it to @ to avoid https":" to split together
+        elements are split with "@" and subtitles split with "^"
+        now you can get subtitles back
+        EpisodeItem(id=158300, season=1, episode=1):https://some-site.com/playlist.ext
+        '''
+        saved_ext_subs = None
+        sep_value = value.split(sep)
         if value:
-            last_id, path = value.split(sep, 1)
+            if len(sep_value) > 2:
+                last_id, path, saved_ext_subs = sep_value
+            else:
+                last_id, path = sep_value
         else:
-            last_id = path = None
+            last_id = path = saved_ext_subs = None
 
+        # Bookmark - previously played
+        # Added - 30147, Previous
+        # Don't forget to split it with ^
         if last_id == current_id and Dialog().yesno(ADDON_NAME, translate(30147)):
-            setResolvedUrl(int(sys.argv[1]), True, item.to_list_item(path=path))
+            setResolvedUrl(int(sys.argv[1]), True, item.to_list_item(path=path, ext_subs=saved_ext_subs.split("^") if saved_ext_subs else None))
         else:
             path = func(item, *args, **kwargs)
-            if path:
+            logging.info("path:")
+            logging.info(value)
+            # Added - alternative way, it looks ugly but works
+            '''
+            set_property(key, current_id + sep + path)
+            TypeError: can only concatenate str to str (not "list, dict whatsoever")
+            '''
+            if isinstance(path, dict):
+                if path['ext_subs']:
+                    set_property(key, current_id + sep + path['url'] + sep + "^".join(path['ext_subs']))
+                else:
+                    set_property(key, current_id + sep + path['url'])
+            elif isinstance(path, str):
                 set_property(key, current_id + sep + path)
-
         return path
 
     return wrapper
@@ -147,9 +175,10 @@ def play(item, method, *args, **kwargs):
         notification(translate(30146))
     else:
         notification(translate(30112))
+        
+    # Added - Finally Adding subs to setResolvedUrl
     if path:
         logging.debug("Going to play url '%s' from provider %s", path, provider)
-        # Added - pass subz
         setResolvedUrl(handle, True, item.to_list_item(path=path, ext_subs=ext_subs if ext_subs else None))
     else:
         setResolvedUrl(handle, False, ListItem())
