@@ -10,6 +10,9 @@ from lib.api.flix.utils import get_data
 from lib.settings import is_cache_enabled, prefer_original_titles, get_language, get_scraper_threads, \
     get_cache_expiration_days
 
+# Added - new infotag method implemented
+from infotagger.listitem import ListItemInfoTag
+
 IMAGE_BASE_URL = "https://image.tmdb.org/t/p/"
 tmdbsimple.API_KEY = "eee9ac1822295afd8dadb555a0cc4ea8"
 
@@ -106,21 +109,42 @@ class VideoItem(object):
         self._art = kwargs.get("art", {})
         self._cast = kwargs.get("cast", [])
 
-    # Added subtitles
+    # Added - Subtitles list
     def to_list_item(self, path=None, playable=False, subz=None):
         list_item = xbmcgui.ListItem(self._title)
-        list_item.setInfo("video", self._info)
-        list_item.setArt(self._art)
-        list_item.setCast(self._cast)
+
+        # Added - new infotag method!!
+        
+        info_tag = ListItemInfoTag(list_item, 'video')
+        info_tag.set_info(self._info)
+        info_tag.set_cast(self._cast)
+        list_item.setArt(self._art)     # why setArt doesn't have infotag yet???
 
         # Added - Subtitles
-        if subz:
-            list_item.setSubtitles(subz)
-        
         if playable:
             list_item.setProperty("IsPlayable", "true")
-        if path is not None:
+
+        '''
+         isinstance(path, dict) to identify...
+         i dont know how to solve when a str type of "path" is passed
+         so I make streams to dict type with "provider_data"
+        '''
+        # Added - subs and url from lazy resolver
+        # logging.info("checker>>")
+        # logging.info(path)
+
+        if isinstance(path, dict):
+            list_item.setPath(path.get("url"))
+            ext_subs = path.get("ext_subs")
+            if ext_subs:
+                list_item.setSubtitles(path.get("ext_subs"))
+
+        # Added - Resolved subs and url 2
+        elif isinstance(path, str):
             list_item.setPath(path)
+            if ext_subs:
+                list_item.setSubtitles(ext_subs)
+
         return list_item
 
     @property
