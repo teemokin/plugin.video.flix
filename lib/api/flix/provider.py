@@ -89,7 +89,7 @@ class ProviderResult(dict):
     set_provider_data, provider_data = _setter_and_getter("provider_data")
 
     # Added: Subtitles
-    set_provider_subtitles, provider_subtitles = _setter_and_getter("provider_subtitles")
+    set_ext_subs, ext_subs = _setter_and_getter("ext_subs")
 
 
 class Provider(object):
