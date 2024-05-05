@@ -6,8 +6,10 @@
         <import addon="script.module.requests" version="2.22.0"/>
         <import addon="script.module.cached" version="0.0.1"/>
         <import addon="script.module.tmdbsimple" version="2.2.0"/>
-        <!-- futures must be optional so we have py2/3 compatibility -->
-        <import addon="script.module.futures" version="2.2.0" optional="true"/>
+        <!-- adding infotager -->
+        <import addon="script.module.infotagger" version="0.0.8"/>
+		<!-- can't believe people still use python2!!? -->
+		<!--        <import addon="script.module.futures" version="2.2.0" optional="true"/>-->
     </requires>
     <extension point="xbmc.python.pluginsource" library="navigation.py">
         <provides>video</provides>
