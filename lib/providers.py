@@ -130,7 +130,11 @@ def play(item, method, *args, **kwargs):
 
         if selected >= 0:
             provider, provider_result = results[selected]
+
+            # Bookmark - Provider result URL
             path = provider_result.url
+            # Added - Subtitles from providers
+            ext_subs = provider_result.ext_subs
             if not path:
                 logging.debug("Need to call 'resolve' from provider %s", provider)
                 try:
