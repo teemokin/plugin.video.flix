@@ -110,7 +110,7 @@ class VideoItem(object):
         self._cast = kwargs.get("cast", [])
 
     # Added - Subtitles list
-    def to_list_item(self, path=None, playable=False, subz=None):
+    def to_list_item(self, path=None, playable=False, ext_subs=None):
         list_item = xbmcgui.ListItem(self._title)
 
         # Added - new infotag method!!
