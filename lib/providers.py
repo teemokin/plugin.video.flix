@@ -146,7 +146,7 @@ def play(item, method, *args, **kwargs):
     if path:
         logging.debug("Going to play url '%s' from provider %s", path, provider)
         # Added - pass subz
-        setResolvedUrl(handle, True, item.to_list_item(path=path, subz=subz if subz else None))
+        setResolvedUrl(handle, True, item.to_list_item(path=path, ext_subs=ext_subs if ext_subs else None))
     else:
         setResolvedUrl(handle, False, ListItem())
     return path
