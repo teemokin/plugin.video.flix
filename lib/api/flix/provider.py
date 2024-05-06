@@ -88,10 +88,6 @@ class ProviderResult(dict):
     set_url, url = _setter_and_getter("url")
     set_provider_data, provider_data = _setter_and_getter("provider_data")
 
-    # Added: Subtitles
-    set_ext_subs, ext_subs = _setter_and_getter("ext_subs")
-
-
 class Provider(object):
     """
     This is where all the logic behind a provider must be implemented. It has methods which
