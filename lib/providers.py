@@ -74,10 +74,10 @@ def get_providers_results(method, *args, **kwargs):
             except Exception as e:
                 logging.error("Invalid format on provider '%s' result (%s): %s", provider, provider_result, e)
             else:
+
                 if _provider_result.url or _provider_result.provider_data:
                     results.append((provider, _provider_result))
     return results
-
 
 # Added - sep ":" to "@"
 def check_replay(func, sep="@"):
@@ -114,20 +114,19 @@ def check_replay(func, sep="@"):
             setResolvedUrl(int(sys.argv[1]), True, item.to_list_item(path=path, ext_subs=saved_ext_subs.split("^") if saved_ext_subs else None))
         else:
             path = func(item, *args, **kwargs)
-            logging.info("path:")
-            logging.info(value)
             # Added - alternative way, it looks ugly but works
             '''
             set_property(key, current_id + sep + path)
             TypeError: can only concatenate str to str (not "list, dict whatsoever")
             '''
             if isinstance(path, dict):
-                if path['ext_subs']:
-                    set_property(key, current_id + sep + path['url'] + sep + "^".join(path['ext_subs']))
+                ext_subs = path.get("ext_subs")
+                if ext_subs:
+                    set_property(key, current_id + sep + path['url'] + sep + "^".join(ext_subs))
                 else:
                     set_property(key, current_id + sep + path['url'])
-            elif isinstance(path, str):
-                set_property(key, current_id + sep + path)
+            # path should be a dictionary type
+
         return path
 
     return wrapper
@@ -158,11 +157,8 @@ def play(item, method, *args, **kwargs):
 
         if selected >= 0:
             provider, provider_result = results[selected]
-
             # Bookmark - Provider result URL
             path = provider_result.url
-            # Added - Subtitles from providers
-            ext_subs = provider_result.ext_subs
 
             if not path:
                 logging.debug("Need to call 'resolve' from provider %s", provider)
@@ -177,10 +173,16 @@ def play(item, method, *args, **kwargs):
     else:
         notification(translate(30112))
 
+    logging.critical(path)
     # Added - Finally Adding subs to setResolvedUrl
-    if path:
+    if isinstance(path, dict):
         logging.debug("Going to play url '%s' from provider %s", path, provider)
-        setResolvedUrl(handle, True, item.to_list_item(path=path, ext_subs=ext_subs if ext_subs else None))
+
+        ext_subs = path.get("ext_subs")
+        if not ext_subs:
+            setResolvedUrl(handle, True, item.to_list_item(path=path['url']))
+        else:
+            setResolvedUrl(handle, True, item.to_list_item(path=path['url'], ext_subs=ext_subs))
     else:
         setResolvedUrl(handle, False, ListItem())
     return path
