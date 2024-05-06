@@ -1,7 +1,9 @@
+import logging
 import time
 from datetime import datetime, timedelta
 
 import tmdbsimple
+import xbmc
 import xbmcgui
 from cached import Cache
 
@@ -102,6 +104,7 @@ def is_unaired(air_date, now):
     return not air_date or datetime(*time.strptime(air_date, "%Y-%m-%d")[:6]) > now
 
 
+# 북마크 - 리스트아이템 부분
 class VideoItem(object):
     def __init__(self, **kwargs):
         self._title = kwargs.get("title", "")
@@ -111,36 +114,25 @@ class VideoItem(object):
 
     # Added - Subtitles list
     def to_list_item(self, path=None, playable=False, ext_subs=None):
+
         list_item = xbmcgui.ListItem(self._title)
 
         # Added - new infotag method!!
-        
         info_tag = ListItemInfoTag(list_item, 'video')
         info_tag.set_info(self._info)
         info_tag.set_cast(self._cast)
-        list_item.setArt(self._art)     # why setArt doesn't have infotag yet???
+        list_item.setArt(self._art)
 
-        # Added - Subtitles
         if playable:
             list_item.setProperty("IsPlayable", "true")
-
         '''
-         isinstance(path, dict) to identify...
-         i dont know how to solve when a str type of "path" is passed
-         so I make streams to dict type with "provider_data"
+         path and ext_subs are
         '''
         # Added - subs and url from lazy resolver
-        # logging.info("checker>>")
-        # logging.info(path)
-
-        if isinstance(path, dict):
-            list_item.setPath(path.get("url"))
-            ext_subs = path.get("ext_subs")
-            if ext_subs:
-                list_item.setSubtitles(path.get("ext_subs"))
-
-        # Added - Resolved subs and url 2
-        elif isinstance(path, str):
+        # logging.debug("pass/ext_subs")
+        # logging.debug(path)
+        # logging.debug(ext_subs)
+        if path:
             list_item.setPath(path)
             if ext_subs:
                 list_item.setSubtitles(ext_subs)
@@ -392,9 +384,9 @@ class Season(SeasonItem):
         still_path = get_image(episode, "still_path")
         art = {"icon": "DefaultVideo.png", "thumb": still_path, "poster": still_path, "fanart": still_path}
 
-        # Added: seasonxepisode on before title "1x03 - Episode 3"
+        # Added: make seasonxepisode on title
         title = "{}x{} - {}".format(self._season_number, str(episode_number).zfill(2), title)
-        
+
         return EpisodeItem(self._show_id, self._season_number, episode_number,
                            title=title, info=info, art=art, cast=get_cast(cast))
 
