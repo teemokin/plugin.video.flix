@@ -104,7 +104,7 @@ def is_unaired(air_date, now):
     return not air_date or datetime(*time.strptime(air_date, "%Y-%m-%d")[:6]) > now
 
 
-# 북마크 - 리스트아이템 부분
+# Bookmark - listitem
 class VideoItem(object):
     def __init__(self, **kwargs):
         self._title = kwargs.get("title", "")
